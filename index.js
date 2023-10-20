@@ -26,6 +26,7 @@ async function run() {
 
     const productsCollection = client.db('productDb').collection('Product');
     const brandsCollection = client.db('productDb').collection('Brand');
+    const addToCardCollection = client.db('cardDb').collection('Card');
 
 
     app.get('/products', async (req, res) => {
@@ -50,6 +51,32 @@ async function run() {
     const products = await cursor.toArray();
     res.send(products);
   });
+
+  app.get('/cards', async (req, res) => {
+    const query = {};
+    const cursor = addToCardCollection.find(query);
+    const products = await cursor.toArray();
+    res.send(products);
+})
+
+  app.post('/cards', async (req, res) => {
+    const card = req.body;
+    
+    // Check if a card with the same properties already exists
+    const existingCard = await addToCardCollection.findOne({
+      property1: card.property1,
+      property2: card.property2
+      // Add more conditions for other properties if needed
+    });
+
+    if (existingCard) {
+      res.status(400).json({ message: 'Card already exists' });
+    } else {
+      const result = await addToCardCollection.insertOne(card);
+      console.log(result);
+      res.status(201).json({ acknowledged: true });
+    }
+ });
 
   
   
