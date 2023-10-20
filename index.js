@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000
 
 app.use(cors())
@@ -59,24 +59,59 @@ async function run() {
     res.send(products);
 })
 
-  app.post('/cards', async (req, res) => {
-    const card = req.body;
+//   app.post('/cards', async (req, res) => {
+//     const card = req.body;
     
-    // Check if a card with the same properties already exists
-    const existingCard = await addToCardCollection.findOne({
-      property1: card.property1,
-      property2: card.property2
-      // Add more conditions for other properties if needed
-    });
+//     // Check if a card with the same properties already exists
+//     const existingCard = await addToCardCollection.findOne({
+//       property1: card.property1,
+//       property2: card.property2
+//       // Add more conditions for other properties if needed
+//     });
 
-    if (existingCard) {
-      res.status(400).json({ message: 'Card already exists' });
-    } else {
-      const result = await addToCardCollection.insertOne(card);
-      console.log(result);
-      res.status(201).json({ acknowledged: true });
-    }
- });
+//     if (existingCard) {
+//       res.status(400).json({ message: 'Card already exists' });
+//     } else {
+//       const result = await addToCardCollection.insertOne(card);
+//       console.log(result);
+//       res.status(201).json({ acknowledged: true });
+//     }
+//  });
+
+
+app.post('/cards', async (req, res) => {
+  const card = req.body;
+  console.log(card);
+  const result = await addToCardCollection.insertOne(card);
+  console.log(result);
+  res.send(result);
+})
+
+
+  app.delete('/cards/:id', async (req, res) => {
+            const id = req.params.id; 
+            const query = {_id: new ObjectId(id) }
+            const result = await addToCardCollection.deleteOne(query);
+            res.send(result);
+        })
+
+  // app.delete('/cards/:id', async (req, res) => {
+  //   const id = req.params.id;
+  //   const query = { _id: new ObjectId(id) };
+  
+  //   try {
+  //     const result = await addToCardCollection.deleteOne(query);
+  //     if (result.deletedCount > 0) {
+  //       res.json({ message: 'Deletion successful' });
+  //     } else {
+  //       res.status(404).json({ message: 'No document found to delete' });
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ message: 'An error occurred during deletion' });
+  //   }
+  // });
+  
 
   
   
