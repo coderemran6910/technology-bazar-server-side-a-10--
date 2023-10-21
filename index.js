@@ -52,6 +52,38 @@ async function run() {
     res.send(products);
   });
 
+
+
+  app.put('/products/:brand/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = {_id:new ObjectId(id)};
+    const options = { upsert: true };
+    const updatedData = req.body;
+    const updateDoc = {
+      $set: { 
+        brand: updatedData.brand,
+        name: updatedData.name,
+        price: updatedData.price,
+        quantity: updatedData.quantity,
+        image: updatedData.image,
+        category: updatedData.category,
+        rating: updatedData.rating,
+      },
+        
+      };
+
+      const result = await productsCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+
+    }
+  
+  );
+
+
+
+
+
+
   app.get('/cards', async (req, res) => {
     const query = {};
     const cursor = addToCardCollection.find(query);
@@ -122,6 +154,13 @@ app.post('/cards', async (req, res) => {
         const result = await productsCollection.insertOne(product);
         console.log(result);
         res.send(result);
+    })
+
+    app.post('products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.findOne(query); 
+      res.send(result);
     })
 
 
